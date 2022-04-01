@@ -45,6 +45,9 @@ inline sf::Color GetColor(int k) {
 }
 
 #define COLOR(k) sf::Color((8 * (k)) % 256, (4 * (k)) % 256, (7 * (k)) % 256)
+#define COLOR_COOL(k) 0xff000000 | ((k) << 8) | ((k) << 16) | ((k) << 24);
+#define COLOR_COOL64(k) 0xff000000 | ((k >> 32) << 8) | ((k >> 32) << 16) | ((k >> 32) << 24);
+//#define COLOR(k) 0xff000000 | (k << 8) | (k << 16) | (k << 24);
 // ----------------------------------------------------------------------------------
 
 void Mandelbrot::Update() {
@@ -141,17 +144,20 @@ void Mandelbrot::UpdateMandelbrotSSE4() {
 }
 
 void Mandelbrot::UpdateMandelbrotSSE8() {
-    float dx = window_.mapPixelToCoords({1, 0}, camera_).x - window_.mapPixelToCoords({0, 0}, camera_).x;
+    sf::Vector2f p1 = window_.mapPixelToCoords({0, 0}, camera_);
+    float x_ = p1.x;
+    
+    sf::Vector2f d = window_.mapPixelToCoords({1, 1}, camera_) - p1;
 
     for (int wy = 0; wy < kWinHeight_; wy += 1) {
         for (int wx = 0; wx + 8 < kWinWidth_; wx += 8) {
             // Init coords
-            sf::Vector2f p1 = window_.mapPixelToCoords({wx, wy}, camera_);
 
             float X0_[8] = {
-                p1.x,          p1.x + dx,     p1.x + dx * 2, p1.x + dx * 3,
-                p1.x + dx * 4, p1.x + dx * 5, p1.x + dx * 6, p1.x + dx * 7,
+                p1.x,          p1.x + d.x,     p1.x + d.x * 2, p1.x + d.x * 3,
+                p1.x + d.x * 4, p1.x + d.x * 5, p1.x + d.x * 6, p1.x + d.x * 7,
             };
+            p1.x += d.x * 8;
 
             __m256 X0 = _mm256_load_ps(X0_);
             __m256 Y0 = _mm256_set1_ps(p1.y);
@@ -180,14 +186,26 @@ void Mandelbrot::UpdateMandelbrotSSE8() {
                 X = _mm256_add_ps(_mm256_sub_ps(X2, Y2), X0);
                 Y = _mm256_add_ps(_mm256_add_ps(XY, XY), Y0);
             }
-            // continue;
 
             // Update color
+//#define OPTIMIZE
+#ifdef OPTIMIZE
+            int64_t* r_ = (int64_t*)&rate;
+            for (int i = 0; i < 4; ++i) {
+                *(int64_t*)(set_buffer_ + wx + i * 2 + wy * kWinWidth_) = COLOR_COOL64(r_[i]);
+            }
+#else
             int *rate_ = (int*) &rate;
             for (int i = 0; i < 8; ++i) {
                 set_buffer_[wx + i + wy * kWinWidth_] = GetColor(rate_[i]).toInteger();
+                //set_buffer_[wx + i + wy * kWinWidth_] = COLOR(rate_[i]);
+                //set_buffer_[wx + i + wy * kWinWidth_] = COLOR_COOL(rate_[i]);
             }
+#endif
         }
+
+        p1.y += d.y;
+        p1.x = x_;  
     }
 
     texture_.update((sf::Uint8*)set_buffer_);

@@ -102,10 +102,7 @@ void Core::UpdateScene() {
       break;
     }
     case Scene::GAME: {
-      //Grid* grid = new Grid(kWidth_, kHeight_, main_camera);
       Mandelbrot* mandelbrot = new Mandelbrot(window_, main_camera);
-      //Player* player = new Player();
-      //Map* map = new Map();
       break;
     }
     case Scene::EXIT: window_.close(); break;

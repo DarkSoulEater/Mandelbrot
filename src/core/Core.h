@@ -14,8 +14,8 @@ class Core {
 
 
  private:
-  const int kWidth_ = 800;//1920;
-  const int kHeight_ = 900;//1080;
+  const int kWidth_ = 1600 / 2;//1920;
+  const int kHeight_ = 800;//1080;
   const char* kAppName = "Taurmaze";
   sf::RenderWindow window_;
   sf::View main_camera;
