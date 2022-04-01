@@ -5,10 +5,12 @@
 #include "util/input.h"
 #include "util/time.hpp"
 
-#include "game/Player.hpp"
-#include "game/Map.hpp"
+#include "game/Grid.hpp"
+#include "game/Mandelbrot.hpp"
 
 Core::Core() : window_(sf::VideoMode(kWidth_, kHeight_), kAppName), main_camera(window_.getDefaultView()) {
+  main_camera.zoom(0.003); // 0.003
+  main_camera.setCenter({0,0});
   LoadScene(Scene::GAME);
 }
 
@@ -99,9 +101,11 @@ void Core::UpdateScene() {
       button->SetPosition(sf::Vector2f(300, 300));
       break;
     }
-    case Scene::GAME:    {
-      Player* player = new Player();
-      Map* map = new Map();
+    case Scene::GAME: {
+      //Grid* grid = new Grid(kWidth_, kHeight_, main_camera);
+      Mandelbrot* mandelbrot = new Mandelbrot(window_, main_camera);
+      //Player* player = new Player();
+      //Map* map = new Map();
       break;
     }
     case Scene::EXIT: window_.close(); break;
@@ -134,25 +138,27 @@ void Core::PollEvent() {
 }
 
 void Core::CameraUpdate() {
-  float camera_move_velocity = 5.0f;
+  static float camera_move_velocity = 0.5f * Time::GetDeltaTime();
   if (input::GetKey(input::KeyCode::W)) {
-    //main_camera.move(0.0f, -camera_move_velocity);
+    main_camera.move(0.0f, -camera_move_velocity);
   } else if (input::GetKey(input::KeyCode::S)) {
-    //main_camera.move(0.0f, +camera_move_velocity);
+    main_camera.move(0.0f, +camera_move_velocity);
   }
 
   if (input::GetKey(input::KeyCode::A)) {
-    //main_camera.move(-camera_move_velocity, 0.0f);
+    main_camera.move(-camera_move_velocity, 0.0f);
   } else if (input::GetKey(input::KeyCode::D)) {
-    //main_camera.move(camera_move_velocity, 0.0f);
+    main_camera.move(camera_move_velocity, 0.0f);
   }
 
   float camera_zoom_velocity = 1.02f;
   if (input::GetKey(input::KeyCode::Z)) {
-    //main_camera.zoom(1 / camera_zoom_velocity);
+    main_camera.zoom(1 / camera_zoom_velocity);
+    camera_move_velocity /= camera_zoom_velocity;
   } else if (input::GetKey(input::KeyCode::X)) {
-    //main_camera.zoom(camera_zoom_velocity);
-  }
+    main_camera.zoom(camera_zoom_velocity);
+    camera_move_velocity *= camera_zoom_velocity;
+  } 
 
   auto mouse_position = sf::Mouse::getPosition(window_);
   input::MousePositionCallback(mouse_position, window_.mapPixelToCoords(mouse_position, main_camera));
