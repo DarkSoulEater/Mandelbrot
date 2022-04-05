@@ -1,5 +1,6 @@
 #include "game/Mandelbrot.hpp"
 
+#include <assert.h>
 #include <emmintrin.h>
 #include <immintrin.h>
 
@@ -158,6 +159,9 @@ void Mandelbrot::UpdateMandelbrotSSE8() {
                 p1.x + d.x * 4, p1.x + d.x * 5, p1.x + d.x * 6, p1.x + d.x * 7,
             };
             p1.x += d.x * 8;
+            //std::cout << X0_;
+            //abort();
+            //assert((size_t)X0_ % 32 == 0);
 
             __m256 X0 = _mm256_load_ps(X0_);
             __m256 Y0 = _mm256_set1_ps(p1.y);

@@ -17,7 +17,7 @@ namespace Time {
 
     //int64_t GetTime() {
         //return now_time_;
-        //return std::chrono::duration_cast<std::chrono::nanoseconds>(now_time_ - now_time_).count();
+        //return std::chrono::duration_cast<std::chrono::nanoseconds>(now_time_).count();
     //}
 
     double GetDeltaTime() {

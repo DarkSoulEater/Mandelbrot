@@ -7,9 +7,10 @@
 
 #include "game/Grid.hpp"
 #include "game/Mandelbrot.hpp"
+#include "game/Image.hpp"
 
 Core::Core() : window_(sf::VideoMode(kWidth_, kHeight_), kAppName), main_camera(window_.getDefaultView()) {
-  main_camera.zoom(0.003); // 0.003
+  //main_camera.zoom(0.003); // 0.003
   main_camera.setCenter({0,0});
   LoadScene(Scene::GAME);
 }
@@ -102,7 +103,8 @@ void Core::UpdateScene() {
       break;
     }
     case Scene::GAME: {
-      Mandelbrot* mandelbrot = new Mandelbrot(window_, main_camera);
+      //Mandelbrot* mandelbrot = new Mandelbrot(window_, main_camera);
+      Image* img = new Image("assets/image/Table.bmp");
       break;
     }
     case Scene::EXIT: window_.close(); break;
