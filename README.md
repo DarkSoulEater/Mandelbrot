@@ -1,2 +1,2 @@
 # Mandelbrot
- visualization of the mandelbrot set + SSE оптимизация 
+ Visualization of the mandelbrot set + SSE оптимизация 
